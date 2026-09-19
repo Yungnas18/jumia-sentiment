@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Batch Upload — Jumia Sentiment Analysis{% endblock %}
+{% block nav_upload %}active{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <span class="eyebrow">Batch Classifier</span>
+    <h1>Classify hundreds of reviews at once</h1>
+    <p>Upload a CSV of Jumia reviews and get an instant sentiment breakdown for the whole batch, plus a downloadable results file. Limits: up to {{ max_rows }} rows, {{ max_size_mb }}MB per file.</p>
+</section>
+
+<div class="card">
+    <label for="model-select-batch">Model</label>
+    <select id="model-select-batch">
+        {% for key, label in model_labels.items() %}
+        <option value="{{ key }}" {% if key == "logistic_regression" %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+
+    <label>CSV file</label>
+    <div class="dropzone" id="dropzone">
+        <input type="file" id="file-input" accept=".csv" hidden>
+        <div class="dropzone-inner" id="dropzone-inner">
+            <p class="dropzone-title">Drop a CSV here, or click to browse</p>
+            <p class="dropzone-sub">Must include a column named <code>review_text</code></p>
+        </div>
+    </div>
+
+    <button class="btn" id="upload-btn" disabled>Classify Batch</button>
+    <a class="btn-ghost" href="/static/sample_batch.csv" download>Download a sample CSV</a>
+
+    <p class="error-msg" id="batch-error-msg"></p>
+    <div class="progress-track" id="progress-track" style="display:none;">
+        <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <p class="progress-label" id="progress-label" style="display:none;">Processing your file...</p>
+</div>
+
+<div class="card" id="batch-result-panel" style="display:none;">
+    <h2 class="section-title">Batch results</h2>
+    <div class="stat-row" id="batch-stat-row"></div>
+
+    <div class="grid-2">
+        <figure class="chart-card" style="margin:0;">
+            <img id="batch-chart-img" src="" alt="Sentiment breakdown for this batch">
+            <figcaption>Sentiment breakdown</figcaption>
+        </figure>
+        <div>
+            <p class="section-sub" style="margin-top:0;">First 20 predictions (download the full file below for all rows).</p>
+            <div class="table-scroll">
+                <table id="preview-table">
+                    <thead>
+                        <tr><th>Review</th><th>Sentiment</th><th>Confidence</th></tr>
+                    </thead>
+                    <tbody id="preview-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <a class="btn" id="download-btn" href="#" style="margin-top: 20px; display: inline-block; text-decoration: none;">Download Full Results (CSV)</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/upload.js"></script>
+{% endblock %}

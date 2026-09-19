@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Jumia Sentiment Analysis{% endblock %}
+{% block nav_dash %}active{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <span class="eyebrow">Evaluation Dashboard</span>
+    <h1>How well does the system actually perform?</h1>
+    <p>Trained on {{ metrics.dataset_info.total_reviews }} real Jumia Nigeria reviews and evaluated with a stratified train/test split plus 5-fold cross-validation.</p>
+</section>
+
+<div class="stat-row">
+    <div class="stat">
+        <div class="value">{{ metrics.dataset_info.total_reviews }}</div>
+        <div class="label">Total reviews</div>
+    </div>
+    <div class="stat">
+        <div class="value" style="color: var(--positive);">{{ metrics.dataset_info.positive_count }}</div>
+        <div class="label">Positive reviews</div>
+    </div>
+    <div class="stat">
+        <div class="value" style="color: var(--negative);">{{ metrics.dataset_info.negative_count }}</div>
+        <div class="label">Negative reviews</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2 class="section-title">Model comparison</h2>
+    <p class="section-sub">Metrics computed on a held-out test set ({{ metrics.dataset_info.test_size }} reviews), stratified so both classes are represented proportionally.</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Model</th>
+                <th>Precision</th>
+                <th>Recall</th>
+                <th>F1</th>
+                <th>Accuracy</th>
+                <th>ROC-AUC</th>
+                <th>CV F1 (5-fold)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key, label in model_labels.items() %}
+            <tr>
+                <td class="model-name">{{ label }}</td>
+                <td class="mono-num">{{ metrics[key].precision }}</td>
+                <td class="mono-num">{{ metrics[key].recall }}</td>
+                <td class="mono-num">{{ metrics[key].f1 }}</td>
+                <td class="mono-num">{{ metrics[key].accuracy }}</td>
+                <td class="mono-num">{{ metrics[key].roc_auc }}</td>
+                <td class="mono-num">{{ metrics[key].cv_f1_mean }} ± {{ metrics[key].cv_f1_std }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <h2 class="section-title">Dataset overview</h2>
+    <p class="section-sub">Sentiment distribution and the most frequent terms customers use.</p>
+    <div class="chart-grid">
+        <figure class="chart-card">
+            <img src="/static/charts/sentiment_pie.png" alt="Pie chart of sentiment distribution">
+            <figcaption>Overall sentiment split</figcaption>
+        </figure>
+        <figure class="chart-card">
+            <img src="/static/charts/wordcloud_all.png" alt="Word cloud of all reviews">
+            <figcaption>Most frequent words — all reviews</figcaption>
+        </figure>
+        <figure class="chart-card">
+            <img src="/static/charts/wordcloud_positive.png" alt="Word cloud of positive reviews">
+            <figcaption>Most frequent words — positive reviews</figcaption>
+        </figure>
+        <figure class="chart-card">
+            <img src="/static/charts/wordcloud_negative.png" alt="Word cloud of negative reviews">
+            <figcaption>Most frequent words — negative reviews</figcaption>
+        </figure>
+    </div>
+</div>
+
+<div class="card">
+    <h2 class="section-title">Naive Bayes performance</h2>
+    <div class="chart-grid">
+        <figure class="chart-card">
+            <img src="/static/charts/roc_naive_bayes.png" alt="ROC curve for Naive Bayes">
+            <figcaption>ROC curve</figcaption>
+        </figure>
+        <figure class="chart-card">
+            <img src="/static/charts/confusion_naive_bayes.png" alt="Confusion matrix for Naive Bayes">
+            <figcaption>Confusion matrix</figcaption>
+        </figure>
+    </div>
+</div>
+
+<div class="card">
+    <h2 class="section-title">Logistic Regression performance</h2>
+    <div class="chart-grid">
+        <figure class="chart-card">
+            <img src="/static/charts/roc_logistic_regression.png" alt="ROC curve for Logistic Regression">
+            <figcaption>ROC curve</figcaption>
+        </figure>
+        <figure class="chart-card">
+            <img src="/static/charts/confusion_logistic_regression.png" alt="Confusion matrix for Logistic Regression">
+            <figcaption>Confusion matrix</figcaption>
+        </figure>
+    </div>
+</div>
+
+<div class="card">
+    <h2 class="section-title">Upload history</h2>
+    <p class="section-sub">
+        These are sentiment breakdowns from CSVs uploaded via the Batch Upload page —
+        the model's <em>predictions</em> on new, unlabeled reviews. This is different
+        from the model comparison above: since these reviews have no true label to
+        check against, this section shows what the model predicted, not how accurate
+        those predictions are. Accuracy is only measurable on the labeled training
+        dataset shown further up this page.
+    </p>
+
+    {% if history %}
+        {% for batch in history %}
+        <div class="history-card">
+            <div class="history-thumb">
+                <img src="{{ batch.chart_url }}" alt="Sentiment breakdown for {{ batch.filename }}">
+            </div>
+            <div>
+                <div class="history-filename">{{ batch.filename }}</div>
+                <div class="history-meta">{{ batch.uploaded_at }} · {{ batch.model_used }} · {{ batch.total_reviews }} reviews</div>
+                <div class="history-counts">
+                    <span class="positive">{{ batch.positive_count }} positive</span>
+                    &nbsp;·&nbsp;
+                    <span class="negative">{{ batch.negative_count }} negative</span>
+                    &nbsp;·&nbsp;
+                    <span>{{ batch.avg_confidence }}% avg confidence</span>
+                </div>
+            </div>
+            <div>
+                <a class="btn-ghost" href="{{ batch.download_url }}" download>Download CSV</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <p>No batches uploaded yet.</p>
+            <p><a href="/upload" style="color: var(--accent);">Upload a CSV of reviews</a> to see predictions appear here.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

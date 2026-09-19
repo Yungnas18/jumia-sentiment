@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Classify a Review — Jumia Sentiment Analysis{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <span class="eyebrow">Live Classifier</span>
+    <h1>What is this review really saying?</h1>
+    <p>Paste any Jumia Nigeria product review below. The system extracts its features and runs it through a trained model to predict whether the customer felt positive or negative about the product.</p>
+</section>
+
+<div class="card">
+    <label for="review-input">Review text</label>
+    <textarea id="review-input" placeholder="e.g. The product arrived quickly but stopped working after two weeks..."></textarea>
+
+    <label for="model-select">Model</label>
+    <select id="model-select">
+        {% for key, label in model_labels.items() %}
+        <option value="{{ key }}" {% if key == "logistic_regression" %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+
+    <button class="btn" id="predict-btn">Classify Sentiment</button>
+    <p class="error-msg" id="error-msg">Something went wrong reaching the prediction service. Please try again.</p>
+
+    <div id="result-panel">
+        <div class="result-header">
+            <span class="result-tag" id="result-tag">—</span>
+            <span class="result-model" id="result-model"></span>
+        </div>
+        <div class="meter-label">
+            <span>Model confidence</span>
+            <span id="confidence-value">0%</span>
+        </div>
+        <div class="meter-track">
+            <div class="meter-fill" id="confidence-fill"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/app.js"></script>
+{% endblock %}

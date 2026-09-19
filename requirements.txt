@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+pydantic
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+nltk
+wordcloud
+joblib
