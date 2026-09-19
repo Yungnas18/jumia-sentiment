@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Jumia Sentiment Analysis
 
 A machine learning system that classifies Jumia Nigeria product reviews as
@@ -188,3 +189,7 @@ Then open **http://127.0.0.1:8000** in your browser.
 - Add SMOTE or other oversampling techniques to address class imbalance
 - Show word-level feature importance for individual predictions (explainability)
 - Let users map their own CSV's column name instead of requiring `review_text`
+=======
+# jumia-sentiment
+A machine learning system that classifies Jumia Nigeria product reviews as **Positive** or **Negative**, served through a FastAPI web application with a live classifier and an evaluation dashboard.
+>>>>>>> 67c0565a8769a6b241405685fab9ffa966eb5934
